@@ -21,7 +21,7 @@ def format_error_response(status_code: int, error: str, message: str, path: str)
         "path": path
     }
 
-@app.post("api/auth/signup", response_model=schemas.UserResponse, status_code=200)
+@app.post("/api/auth/signup", response_model=schemas.UserResponse, status_code=200)
 async def signup(user: schemas.UserCreate, request: Request, db: Session = Depends(get_db)):
     try:
         # Check if the email already exists
