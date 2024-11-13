@@ -57,6 +57,9 @@ class ApiResponse(BaseModel):
     timestamp: str = datetime.utcnow().isoformat()
     errors: Optional[Dict[str, str]] = None
 
+    class Config:
+        orm_mode = True
+
 class BookResponse(BaseModel):
     id: int
     title: str
@@ -68,3 +71,4 @@ class BookResponse(BaseModel):
 
     class Config:
         orm_mode = True
+        from_attributes = True

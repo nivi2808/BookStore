@@ -7,6 +7,8 @@ import models, schemas
 from database import engine, get_db
 import json
 
+from schemas import BookResponse
+
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger('_name_')
@@ -101,21 +103,47 @@ async def add_book(book: schemas.BookData, db: Session = Depends(get_db)):
 async def get_book(book_id:int, db: Session = Depends(get_db)):
     try:
 
+        logging.info(f"Fetching book with ID: {book_id}")
         book = db.query(models.Book).filter(models.Book.id == book_id).first()
+        print(book.title)
         if  book:
-            error_response = schemas.ApiResponse(
-                status="error",
-                message="Book exists",
-                data=None,
+            logging.info("fetched book successfully")
+
+            # Convert the book SQLAlchemy object to a Pydantic BookResponse model
+            book_data = schemas.BookResponse.from_orm(book)
+
+            success_response = schemas.ApiResponse(
+                status="success",
+                message="Book found",
+                data=book_data,
                 timestamp=datetime.utcnow().isoformat(),
-                errors=None
-            errors = {
-                "additionalProp1": "A book with this title and author already exists.",
-                "additionalProp2": "Duplicate entry error",
-                "additionalProp3": "Check the book title and author"
-                }
+                errors = None
             )
-        return book
+            return success_response
 
 
+        logging.info("Book not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Book not found"
+        )
 
+
+    except Exception as e:
+        logging.error(f"An error occurred while fetching the book: {e}")
+        error_response = schemas.ApiResponse(
+            status="error",
+            message="Book not found",
+            data=None,
+            timestamp=datetime.utcnow().isoformat(),
+            errors={
+                "additionalProp1": "No book found with this ID",
+                "additionalProp2": "Entry not found",
+                "additionalProp3": "Check the book ID and try again"
+
+            }
+        )
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=error_response.dict())
+
+# @app.get("/api/bookstore/books", response_model=schemas.ApiResponse, status_code=status.HTTP_200_OK)
+# async def get_books(db: Session = Depends(get_db)):
