@@ -1,8 +1,6 @@
-
 import os
 import logging
 from typing import Optional
-
 import jwt
 import pdb
 from fastapi import FastAPI, Depends, HTTPException, Request, status, Header
@@ -14,11 +12,14 @@ from database import engine, get_db
 from passlib.context import CryptContext
 from datetime import datetime, timedelta
 
+
+
 # from venv.bin import uvicorn
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger('_name_')
+
 # Create tables if they don't exist
 models.Base.metadata.create_all(bind=engine)
 
@@ -216,13 +217,6 @@ async def logout(token: str = Depends(oauth2_scheme)):
             content={"message": "An unexpected error occurred"}
         )
 
-# @app.get("/protected")
-# async def protected_route(token: str = Depends(oauth2_scheme)):
-#     decode_access_token(token)
-#     return {"message": "You have access to this protected route."}
-
-# if __name__ == "__main__":
-#     uvicorn.run(app, host="0.0.0.0", port=8000)
 
 
 
