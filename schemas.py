@@ -43,7 +43,7 @@ class Category(str, Enum):
 
 class BookData(BaseModel):
     id: int
-    title: str = Field(..., min_length=1)
+    title: str = Field(..., min_length=2)
     author: str = Field(..., min_length=1)
     category: Category = Field(..., min_length=1)
     price: float = Field(..., gt=1)
