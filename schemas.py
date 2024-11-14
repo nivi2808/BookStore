@@ -1,7 +1,8 @@
 from datetime import datetime
-from typing import Optional, Dict
+from typing import Optional, Dict, List
 from pydantic import BaseModel, EmailStr, Field, constr
 from enum import Enum
+from models import CategoryEnum
 
 class UserCreate(BaseModel):
     email: EmailStr
@@ -39,26 +40,37 @@ class Category(str, Enum):
     MEDIA = "MEDIA"
     OTHERS = "OTHERS"
     # Add more categories if needed
+    class Config:
+        orm_mode = True
+        from_attributes = True
 
 
 class BookData(BaseModel):
     id: int
     title: str = Field(..., min_length=2)
     author: str = Field(..., min_length=1)
-    category: Category = Field(..., min_length=1)
+    # category: Category = Field(..., min_length=1)
+    category: CategoryEnum
     price: float = Field(..., gt=1)
     totalCount: int = Field(..., gt=1)
     sold: int = Field(..., gt=1)
 
+    class Config:
+        orm_mode = True
+        from_attributes = True
+
 class ApiResponse(BaseModel):
     status: str
     message: str
-    data: Optional[BookData] = None
+    data: Optional[List[BookData]] = None
+    # data: Optional[BookResponse]
+
     timestamp: str = datetime.utcnow().isoformat()
     errors: Optional[Dict[str, str]] = None
 
     class Config:
         orm_mode = True
+        from_attributes = True
 
 class BookResponse(BaseModel):
     id: int
@@ -72,3 +84,6 @@ class BookResponse(BaseModel):
     class Config:
         orm_mode = True
         from_attributes = True
+
+
+
