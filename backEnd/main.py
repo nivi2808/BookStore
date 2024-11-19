@@ -1,11 +1,11 @@
 import logging
 
 from fastapi import FastAPI
-from auth import router as auth_router
-from orders import router as orders_router
-from bookstore import router as bookstore_router
-from category import router as category_router
-from reviews import router as reviews_router
+from backEnd.auth import router as auth_router
+from backEnd.orders import router as orders_router
+from backEnd.bookstore import router as bookstore_router
+from backEnd.category import router as category_router
+from backEnd.reviews import router as reviews_router
 
 app = FastAPI()
 

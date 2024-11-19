@@ -1,12 +1,12 @@
 import logging
 from datetime import datetime
 from typing import List
-from fastapi import FastAPI, APIRouter, HTTPException, status, Depends
+from fastapi import APIRouter, HTTPException, status, Depends
 from sqlalchemy.orm import Session
-from database import get_db
-from schemas import CategoryResponse, CategoryEnum, ApiResponseListCategory
-import models, schemas
-
+from backEnd.database import get_db
+from backEnd.schemas import CategoryEnum
+# import models, schemas
+from backEnd import models, schemas
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
@@ -43,7 +43,7 @@ async def get_all_categories():
 
 
 
-@router.get("/api/categories/{category}/books",response_model=List[schemas.BookResponse], status_code=status.HTTP_200_OK)
+@router.get("/api/categories/{category}/books", response_model=List[schemas.BookResponse], status_code=status.HTTP_200_OK)
 async def get_books_by_category(category: CategoryEnum, db: Session = Depends(get_db)):
 
     try:

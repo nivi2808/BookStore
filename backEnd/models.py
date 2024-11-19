@@ -1,15 +1,11 @@
-import enum
 from datetime import datetime
-from enum import Enum as PyEnum
 
 from sqlalchemy import Column, String, Integer, Float, ForeignKey, DateTime, Enum
 from sqlalchemy.orm import relationship
 
-import database
-from database import Base
-from sqlalchemy.schema import CheckConstraint
+from backEnd.database import Base
 
-from enums import CategoryEnum
+from backEnd.enums import CategoryEnum
 
 
 class User(Base):
@@ -19,6 +15,9 @@ class User(Base):
     email = Column(String, unique=True, index=True, nullable= False)
     password = Column(String(255), nullable=False)
     name = Column(String, nullable=False)
+
+    # Relationship to reviews
+    reviews = relationship("Review", back_populates="user")
 
 
 class Book(Base):
@@ -62,11 +61,16 @@ class Review(Base):
     __tablename__ = "reviews"
     id = Column(Integer, primary_key=True, index=True)
     book_id = Column(Integer, ForeignKey("books.id"), nullable=False)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     rating = Column(Float, nullable=False)
     comment = Column(String, nullable=True)
 
+    created_at = Column(DateTime, default=datetime.utcnow)
+
     # Relationship with Book
     book = relationship("Book", back_populates="reviews")
+    # Relationship with User (Optional, for clarity and navigation)
+    user = relationship("User", back_populates="reviews", lazy="joined")
 
 
 

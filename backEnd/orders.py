@@ -1,13 +1,12 @@
 import logging
-from fastapi import FastAPI, HTTPException, status, Depends, APIRouter
+from fastapi import HTTPException, status, Depends, APIRouter
 from sqlalchemy import cast, DateTime
 from sqlalchemy.orm import Session
 from datetime import datetime
-from typing import List, Optional
+from backEnd import models, schemas
 
-import models, schemas
-from database import engine, get_db
-from auth import get_current_user
+from backEnd.database import engine, get_db
+from backEnd.auth import get_current_user
 
 
 

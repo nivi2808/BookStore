@@ -1,23 +1,19 @@
 import logging
 from typing import Optional
 
-from fastapi import FastAPI, HTTPException, status, Depends, Query, APIRouter
+from fastapi import HTTPException, status, Depends, Query, APIRouter
 from fastapi.responses import JSONResponse
 from sqlalchemy import or_
 from sqlalchemy.exc import SQLAlchemyError, NoResultFound
 from sqlalchemy.orm import Session
-from datetime import datetime, timedelta
-from schemas import Category, ApiResponse, BookData, PlaceOrderRequest
+from datetime import datetime
+from backEnd.schemas import PlaceOrderRequest
 # from schemas import ApiResponseOrder,
-from schemas import ApiResponseBook, QuantityUpdateRequest, ApiResponseOrder
-from sqlalchemy.sql.coercions import expect
+from backEnd import models, schemas
+# import models, schemas
+from backEnd.database import engine, get_db
 
-import models, schemas
-from database import engine, get_db
 import json
-from models import Book
-
-from schemas import BookResponse
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)

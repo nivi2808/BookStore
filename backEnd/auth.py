@@ -1,14 +1,12 @@
-import os
 import logging
-from typing import Optional
 import jwt
-import pdb
-from fastapi import FastAPI, Depends, HTTPException, Request, status, Header, APIRouter
+from fastapi import Depends, HTTPException, Request, status, APIRouter
 from fastapi.responses import JSONResponse
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
-import models, schemas
-from database import engine, get_db
+from backEnd import models, schemas
+# import models, schemas
+from backEnd.database import engine, get_db
 from passlib.context import CryptContext
 from datetime import datetime, timedelta
 

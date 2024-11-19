@@ -1,9 +1,8 @@
-import enum
 from datetime import datetime
-from typing import Optional, Dict, List, Union, Any
-from pydantic import BaseModel, EmailStr, Field, constr
+from typing import Optional, Dict, List, Union
+from pydantic import BaseModel, EmailStr, Field
 from enum import Enum
-from models import CategoryEnum
+
 
 class UserCreate(BaseModel):
     email: EmailStr
@@ -231,13 +230,37 @@ class ApiResponseListCategory(BaseModel):
 
 
 class ReviewRequest(BaseModel):
-    rating: float = Field(..., ge= 0, le= 1,description="Rating should be between 0 and 5")
+    rating: float = Field(..., ge= 0, le= 5,description="Rating should be between 0 and 5")
     comment: str = Field(None, min_length=2,max_length=100,description="Optional comments for the review")
 
     class Config:
          orm_mode = True
 
 
+
+class ReviewResponse(BaseModel):
+    id: int
+    rating: float
+    comment: str
+    userEmail: str
+    createdAt: datetime
+
+    class Config:
+        orm_mode = True
+        from_attributes = True
+
+
+class ErrorResponse(BaseModel):
+    status: str
+    message: str
+    data: Optional[Dict] = None
+    timestamp: datetime
+    errors: Dict[str, str]
+    details: Optional[Dict] = None
+    path: str
+    class Config:
+        orm_mode = True
+        from_attributes = True
 
 
 
