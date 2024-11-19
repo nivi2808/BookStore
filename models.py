@@ -1,8 +1,16 @@
 import enum
-from sqlalchemy import Column, String, Integer, Float
+from datetime import datetime
+from enum import Enum as PyEnum
+
+from sqlalchemy import Column, String, Integer, Float, ForeignKey, DateTime, Enum
+from sqlalchemy.orm import relationship
+
 import database
 from database import Base
 from sqlalchemy.schema import CheckConstraint
+
+from enums import CategoryEnum
+
 
 class User(Base):
     __tablename__ = "users"
@@ -24,16 +32,43 @@ class Book(Base):
     totalCount = Column(Integer, nullable=False)
     sold = Column(Integer, nullable=False)
 
-class CategoryEnum(str, enum.Enum):
-    LITERATURE = "LITERATURE"
-    NONFICTION = "NONFICTION"
-    ACTION = "ACTION"
-    THRILLER = "THRILLER"
-    TECHNOLOGY= "TECHNOLOGY"
-    DRAMA = "DRAMA"
-    POETRY = "POETRY"
-    MEDIA = "MEDIA"
-    OTHERS = "OTHERS"
+    # Relationship with the Order model
+    orders = relationship("Order", back_populates="book")
+    # Add relationship to reviews
+    reviews = relationship("Review", back_populates="book")
 
 
-    # Add other categories as needed
+class Category(Base):
+    __tablename__ = 'category'
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, nullable=False)
+    category_type = Column(Enum(CategoryEnum), nullable=False)  # Enum for category_type
+
+class Order(Base):
+    __tablename__ = "orders"
+    id = Column(Integer, primary_key=True, index=True)
+    book_id = Column(Integer, ForeignKey("books.id", ondelete="CASCADE"), nullable=False)
+    quantity = Column(Integer, nullable=False)
+    total_price = Column(Float, nullable=False)
+    order_date = Column(DateTime, nullable=False)
+    customer_id = Column(Integer, ForeignKey("users.id"), nullable=True)
+
+    # Define relationship with the Book model
+    book = relationship("Book", back_populates="orders")
+
+
+class Review(Base):
+    __tablename__ = "reviews"
+    id = Column(Integer, primary_key=True, index=True)
+    book_id = Column(Integer, ForeignKey("books.id"), nullable=False)
+    rating = Column(Float, nullable=False)
+    comment = Column(String, nullable=True)
+
+    # Relationship with Book
+    book = relationship("Book", back_populates="reviews")
+
+
+
+
+

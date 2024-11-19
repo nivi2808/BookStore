@@ -3,11 +3,6 @@ from datetime import datetime
 from typing import Optional, Dict, List, Union, Any
 from pydantic import BaseModel, EmailStr, Field, constr
 from enum import Enum
-
-from pydantic._internal._known_annotated_metadata import schemas
-
-# from starlette import schemas
-
 from models import CategoryEnum
 
 class UserCreate(BaseModel):
@@ -30,12 +25,18 @@ class UserResponse(BaseModel):
 class UserLogin(BaseModel):
     email: EmailStr
     password: str
+    class Config:
+        orm_mode = True
 
+class AuthResponse(BaseModel):
+    token: str
+    token_type:str
     class Config:
         orm_mode = True
 
 
-class Category(str, Enum):
+
+class CategoryEnum(str, Enum):
     LITERATURE = "LITERATURE"
     NONFICTION = "NONFICTION"
     ACTION = "ACTION"
@@ -45,10 +46,22 @@ class Category(str, Enum):
     POETRY = "POETRY"
     MEDIA = "MEDIA"
     OTHERS = "OTHERS"
-    # Add more categories if needed
+
+
+
+class CategoryResponse(BaseModel):
+    category: CategoryEnum  # Use the Enum directly in the response model
+
+    class Config:
+        use_enum_values = True  # Ensures the response returns the string values instead of the enum type
+
+class Category(BaseModel):
+    id: int
+    name: str
+    category_type: CategoryEnum
+
     class Config:
         orm_mode = True
-        from_attributes = True
 
 
 class BookData(BaseModel):
@@ -102,7 +115,7 @@ class BookResponse(BaseModel):
     id: int
     title: str
     author: str
-    category: Category
+    category: str
     price: float
     totalCount: int
     sold: int
@@ -126,9 +139,6 @@ class ApiResponseListBook(BaseModel):
 class ApiResponseBook(BaseModel):
     status: str
     message: str
-    # data: Union[BookResponse, List[BookResponse]] = None  # No "schemas." prefix here
-    # data: Optional[Union[dict, List[dict]]] = None  # Accept both a dict and a list
-    # data: Union[schemas.BookResponse, List[schemas.BookResponse]] = None
     data: Union["BookResponse", List["BookResponse"]] = None
     timestamp: str = datetime.utcnow().isoformat()
     errors: Optional[dict] = None
@@ -151,13 +161,10 @@ class order(BaseModel):
         orm_mode = True
 
 
-
 class ApiResponseOrder(BaseModel):
     status: str
     message: str
     data: Union[BookResponse, List[BookResponse]] = None  # No "schemas." prefix here
-    # data: Union["BookResponse", List["BookResponse"]] = None  # Use forward reference
-    # data: Union[schemas.OrderResponse, List[schemas.OrderResponse]] = None
     timestamp: str = datetime.utcnow().isoformat()
     errors: Optional[dict] = None
 
@@ -165,9 +172,7 @@ class ApiResponseOrder(BaseModel):
         orm_mode = True
         from_attributes = True
 
-class OrderItemRequest(BaseModel):
-    book_id: int
-    quantity: int
+
 
 class Order(BaseModel):
     quantity: int
@@ -175,15 +180,18 @@ class Order(BaseModel):
 class OrderRequest(BaseModel):
     orders: List[Order]
 
+class OrderItemRequest(BaseModel):
+    book_id: int
+    quantity: int
+
 class PlaceOrderRequest(BaseModel):
-    orders: List[OrderItemRequest]
+    items: List[OrderItemRequest]
+
+
 
 class OrderDetail(BaseModel):
-    id: int
-    title: str
-    author: str
-    category: str
-    price: float
+    book_id: int
+    quantity: int
     total_price: float
 
 
@@ -197,11 +205,39 @@ class PlaceOrderResponse(BaseModel):
 class ApiResponseListOrder(BaseModel):
     status: str
     message: str
-    data: dict  # Or define a model if you want stricter validation
-    timestamp: str
+    data: List[OrderDetail] # Or define a model if you want stricter validation
+    timestamp: datetime
     errors: Optional[List[str]]
 
     class Config:
         orm_mode = True
         from_attributes = True
+
+class OrderResponse(BaseModel):
+    status: str
+    message: Optional[str] = None  # Add a message field
+    data: Optional[List[OrderDetail]] = None  # The order details (data)
+    total_amount: float
+    timestamp: str  # For example, you can use the current time
+    errors: Optional[List[str]] = []  # List of error messages if any
+
+
+class ApiResponseListCategory(BaseModel):
+    status: str
+    message: str
+    data: List[str]
+    timestamp: str
+    # errors: Optional[List[str]] = []
+
+
+class ReviewRequest(BaseModel):
+    rating: float = Field(..., ge= 0, le= 1,description="Rating should be between 0 and 5")
+    comment: str = Field(None, min_length=2,max_length=100,description="Optional comments for the review")
+
+    class Config:
+         orm_mode = True
+
+
+
+
 

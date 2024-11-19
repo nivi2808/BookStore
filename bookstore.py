@@ -1,9 +1,5 @@
 import logging
-from http.client import responses
-from lib2to3.fixes.fix_input import context
-from pyexpat.errors import messages
 from typing import Optional
-from urllib.request import Request
 
 from fastapi import FastAPI, HTTPException, status, Depends, Query, APIRouter
 from fastapi.responses import JSONResponse
@@ -28,7 +24,7 @@ logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger('_name_')
 
 # Initialize FastAPI and create tables
-app = FastAPI()
+# app = FastAPI()
 router = APIRouter()
 # app.include_router(router)
 models.Base.metadata.create_all(bind=engine)
@@ -42,12 +38,6 @@ class DateTimeEncoder(json.JSONEncoder):
 
 
 logging.basicConfig(level=logging.DEBUG)
-
-@app.on_event("startup")
-async def startup():
-    for route in app.routes:
-        logging.debug(f"Registered route: {route.path} method: {route.methods}")
-
 
 @router.post("/api/bookstore/books", response_model=schemas.ApiResponse, status_code=status.HTTP_201_CREATED)
 async def add_book(book: schemas.BookData, db: Session = Depends(get_db)):
@@ -823,30 +813,3 @@ async def place_order(
     except Exception as e:
         logging.error(f"Unexpected error: {str(e)}")
         raise HTTPException(status_code=500, detail="Internal Server Error")
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-app.include_router(router)
-
-
-
-
-
-
-
-
-
-
