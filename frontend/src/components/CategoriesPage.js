@@ -59,7 +59,7 @@ const CategoriesPage = () => {
           categories.map((category, index) => (
             <Link
               key={index}
-              to={`/category/${category.toLowerCase()}`}
+              to={`/category/${category}`}
               className="text-blue-300 hover:underline"
             >
               {category}
@@ -70,7 +70,7 @@ const CategoriesPage = () => {
         )}
       </nav>
       <main className="p-4">
-        <p>Select a category from the header to view books.</p>
+        <p>Select a category  to view books.</p>
       </main>
     </div>
   );

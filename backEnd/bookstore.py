@@ -235,57 +235,6 @@ async def search_books(
         )
 
 
-@router.delete("/api/bookstore/books/{book_id}", response_model=schemas.ApiResponse, status_code=status.HTTP_200_OK)
-async def delete_book(book_id:int, db: Session = Depends(get_db)):
-    try:
-        logging.info("Finding the book")
-        book = db.query(models.Book).filter(models.Book.id == book_id).first()
-
-        if not book:
-
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"Book with ID {book_id} not found."
-            )
-        db.delete(book)
-        db.commit()
-        logging.info("Book deleted")
-
-        # Return success response
-        success_response = schemas.ApiResponse(
-            status="success",
-            message=f"Book with ID {book_id} has been successfully deleted.",
-            data=None,
-            timestamp=datetime.utcnow().isoformat(),
-            errors=None
-        )
-
-        logging.info(f"Book with ID {book_id} deleted successfully.")
-        return success_response
-
-    except NoResultFound:
-        # This is a specific error if the record does not exist
-        logging.error(f"Book with ID {book_id} not found.")
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Book with ID {book_id} not found."
-        )
-
-    except SQLAlchemyError as sql_error:
-        # Handle any database related issues like SQL conflicts
-        logging.error(f"SQL error occurred while deleting the book: {str(sql_error)}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Internal server error occurred while trying to delete the book."
-        )
-
-    except Exception as e:
-        # Catch other unexpected errors
-        logging.error(f"Unexpected error occurred: {str(e)}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="An unexpected error occurred."
-        )
 
 
 @router.get("/api/bookstore/count/{book_id}", response_model=schemas.ApiResponse, status_code=status.HTTP_200_OK)
@@ -809,3 +758,55 @@ async def place_order(
     except Exception as e:
         logging.error(f"Unexpected error: {str(e)}")
         raise HTTPException(status_code=500, detail="Internal Server Error")
+
+@router.delete("/api/bookstore/books/{book_id}", response_model=schemas.ApiResponse, status_code=status.HTTP_200_OK)
+async def delete_book(book_id:int, db: Session = Depends(get_db)):
+    try:
+        logging.info("Finding the book")
+        book = db.query(models.Book).filter(models.Book.id == book_id).first()
+
+        if not book:
+
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Book with ID {book_id} not found."
+            )
+        db.delete(book)
+        db.commit()
+        logging.info("Book deleted")
+
+        # Return success response
+        success_response = schemas.ApiResponse(
+            status="success",
+            message=f"Book with ID {book_id} has been successfully deleted.",
+            data=None,
+            timestamp=datetime.utcnow().isoformat(),
+            errors=None
+        )
+
+        logging.info(f"Book with ID {book_id} deleted successfully.")
+        return success_response
+
+    except NoResultFound:
+        # This is a specific error if the record does not exist
+        logging.error(f"Book with ID {book_id} not found.")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Book with ID {book_id} not found."
+        )
+
+    except SQLAlchemyError as sql_error:
+        # Handle any database related issues like SQL conflicts
+        logging.error(f"SQL error occurred while deleting the book: {str(sql_error)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Internal server error occurred while trying to delete the book."
+        )
+
+    except Exception as e:
+        # Catch other unexpected errors
+        logging.error(f"Unexpected error occurred: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="An unexpected error occurred."
+        )
